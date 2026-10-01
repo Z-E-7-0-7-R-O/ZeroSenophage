@@ -44,7 +44,7 @@ The engineered senolytic agent ("senophage") operates via a dual-action therapeu
 
 **Source Code Modules & Engine Components:**
 
-* **[Zero.Nucleus.cpp](Zero.Nucleus.cpp)**
+* **[Zero.Nucleus.cpp](src/Zero.Nucleus.cpp)**
   * **Role:** Application Entry Point & High-Precision System Lifecycle Manager.
   * **Implementation:** Overrides OS display scaling using `SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2)` to enforce 1:1 hardware pixel mapping and eradicate DWM bilinear stretching. Manages window creation (`AdjustWindowRect` for 1024 × 1024 client area) and spawns a dedicated high-priority physics thread (`ThermodynamicComputeThread`). Implements death-spiral accumulator clamping (`max_accumulator_threshold = 3 * dt`) to prevent physics stalls upon OS wake, and executes hybrid spin-yield pacing to lock optical rendering strictly to 60 Hz.
 
