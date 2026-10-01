@@ -44,15 +44,15 @@ The engineered senolytic agent ("senophage") operates via a dual-action therapeu
 
 **Source Code Modules & Engine Components:**
 
-* **[Zero.Nucleus.cpp](Zero.Nucleus.cpp)**
+* **[Zero.Nucleus.cpp](src/Zero.Nucleus.cpp)**
   * **Role:** Application Entry Point & High-Precision System Lifecycle Manager.
   * **Implementation:** Overrides OS display scaling using `SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2)` to enforce 1:1 hardware pixel mapping and eradicate DWM bilinear stretching. Manages window creation (`AdjustWindowRect` for 1024 × 1024 client area) and spawns a dedicated high-priority physics thread (`ThermodynamicComputeThread`). Implements death-spiral accumulator clamping (`max_accumulator_threshold = 3 * dt`) to prevent physics stalls upon OS wake, and executes hybrid spin-yield pacing to lock optical rendering strictly to 60 Hz.
 
-* **[Matrix.Orchestrator.h](Matrix.Orchestrator.h) | [Matrix.Orchestrator.cpp](Matrix.Orchestrator.cpp)**
+* **[Matrix.Orchestrator.h](src/Matrix.Orchestrator.h) | [Matrix.Orchestrator.cpp](src/Matrix.Orchestrator.cpp)**
   * **Role:** Asynchronous Subsystem Orchestrator & Multi-Stream CUDA Pipeline Manager.
   * **Implementation:** Instantiates and coordinates all CUDA compute environments (`ComputationalFluidDynamicsEnvironment`, `ReactionDiffusionField`, `MacromolecularGenomicEnvironment`, `EpigeneticPromoterRegistry`, `ProteomicExpressionState`, `CentralDogmaEngine`, `ThermodynamicMutagenesisEngine`, `ThermodynamicPARPRepairEngine`, and agent populations). Manages 5 non-blocking CUDA streams (`compute_stream_fluidics`, `compute_stream_biochemical`, `compute_stream_kinematics`, `compute_stream_genomics`, `compute_stream_telemetry`) with CUDA event cross-stream synchronization barriers. Manages triple-buffered render state pools (`BiophysicalRenderState state_pool[3]`) for lock-free compute-render exchange. Interrogates hardware status via NVML (`nvmlDeviceGetTemperature`, `nvmlDeviceGetClockInfo`).
 
-* **[Autonomous.Senolytic.Population.cuh](Autonomous.Senolytic.Population.cuh) | [Autonomous.Senolytic.Population.cu](Autonomous.Senolytic.Population.cu)**
+* **[Autonomous.Senolytic.Population.cuh](src/Autonomous.Senolytic.Population.cuh) | [Autonomous.Senolytic.Population.cu](src/Autonomous.Senolytic.Population.cu)**
   * **Role:** Cellular Agent Kinematics, Phagocytic Synapse & Efferotabolism Engine.
   * **Implementation:** Defines `SenescentCellPopulation` and `AutonomousSenolyticAgentPopulation` using ping-pong double buffering (`d_pos_x_current`, `d_pos_x_next`, `d_atp_level_current`, `d_lipid_burden_current`, etc.). Executes four specialized CUDA kernels:
     * `Tissue_Secretion_Kernel`: Evaluates local senophage/scavenger densities, CD47-SIRPα inhibitory receptor shielding, cooperative swarming synergy, phagocytic cup formation, macropinocytosis, trogocytosis nibbling, trogoptosis secondary necrosis acceleration, and in-situ stochastic cell turnover using PCG hashing (`Generate_PCG_Hash`).
@@ -60,55 +60,55 @@ The engineered senolytic agent ("senophage") operates via a dual-action therapeu
     * `Read_Olfactory_Sensors_Kernel`: Processes 8-directional SASP concentration sampling with receptor desensitization (fatigue accumulation), lateral inhibition, and P2RY2 receptor expression scaling.
     * `Autonomous_Agent_Kinematics_Kernel`: Executes 256-thread-per-agent block reductions. Calculates steric inter-agent repulsion, Lévy walk heavy-tailed stochastic search steps (`clamped_levy`), actin protrusive thrust vectors scaled by `ACTB` protein levels, Hebbian motor drive, drag reduction upon integrin target commitment, fatty acid β-oxidation ATP regeneration, ABCA1 cholesterol efflux pumping, lipotoxicity ER stress (Hill function), starvation autophagy energy reserve, and Peskin immersed-boundary fluid force injection (`ext_fx`, `ext_fy`).
 
-* **[Lattice.Boltzmann.Plasma.cuh](Lattice.Boltzmann.Plasma.cuh) | [Lattice.Boltzmann.Plasma.cu](Lattice.Boltzmann.Plasma.cu)**
+* **[Lattice.Boltzmann.Plasma.cuh](src/Lattice.Boltzmann.Plasma.cuh) | [Lattice.Boltzmann.Plasma.cu](src/Lattice.Boltzmann.Plasma.cu)**
   * **Role:** Interstitial Plasma Computational Fluid Dynamics (CFD) Environment.
   * **Implementation:** Implements a 2D D2Q9 Lattice Boltzmann Method (LBM) solver using the Bhatnagar-Gross-Krook (BGK) collision operator. Sets plasma relaxation time `PLASMA_TAU = 0.8f` to match blood plasma kinematic viscosity at 37°C. Calculates local density ρ and velocity vectors (`u_x, u_y`), applying hyperbolic tangent velocity clamping (`tanhf`) to enforce speed-of-sound Mach limits (< 0.3 c_s) and injecting Brownian stochastic forcing.
 
-* **[Reaction.Diffusion.SASP.cuh](Reaction.Diffusion.SASP.cuh) | [Reaction.Diffusion.SASP.cu](Reaction.Diffusion.SASP.cu)**
+* **[Reaction.Diffusion.SASP.cuh](src/Reaction.Diffusion.SASP.cuh) | [Reaction.Diffusion.SASP.cu](src/Reaction.Diffusion.SASP.cu)**
   * **Role:** Biochemical Signaling Field & Partial Differential Equation Solver.
   * **Implementation:** Manages 2D grid fields (`d_sasp_concentration`, `d_atp_concentration`). Executes `PDE_Reaction_Diffusion_Kernel` to solve advection-diffusion-reaction equations using an 8-neighbor discrete 9-point Laplacian operator, sub-pixel bilinear interpolation from LBM fluid velocity vectors (`u_x, u_y`), toroidal boundary modulo wrapping, natural chemical decay, and cellular endocytosis clearance sinks.
 
-* **[Macromolecular.Genomic.Allocation.cuh](Macromolecular.Genomic.Allocation.cuh) | [Macromolecular.Genomic.Allocation.cu](Macromolecular.Genomic.Allocation.cu)**
+* **[Macromolecular.Genomic.Allocation.cuh](src/Macromolecular.Genomic.Allocation.cuh) | [Macromolecular.Genomic.Allocation.cu](src/Macromolecular.Genomic.Allocation.cu)**
   * **Role:** 64-Bit VRAM Macromolecular Genomic Storage Manager.
   * **Implementation:** Allocates 2,147,483,580 `uint32_t` words (~8.59 GB VRAM) storing 34,359,738,368 total base pairs across the ecosystem (104,120,416 bp per agent across 330 initial agents). Employs 2-bit nucleotide bit-packing (16 base pairs per `uint32_t` word). Executes `Stochastic_Heterochromatin_Seeding_Kernel` for background heterochromatin initialization and `WildType_CodingSequence_Implantation_Kernel` to write wild-type stability patterns (`0xAAAAAAAA`) at specific loci (`ACTB`, `CD47`, `CD47_REPRESSOR`, `SIRPA`, `P2RY2`, `ABCA1`).
 
-* **[Epigenetic.Promoter.Indexing.cuh](Epigenetic.Promoter.Indexing.cuh) | [Epigenetic.Promoter.Indexing.cu](Epigenetic.Promoter.Indexing.cu)**
+* **[Epigenetic.Promoter.Indexing.cuh](src/Epigenetic.Promoter.Indexing.cuh) | [Epigenetic.Promoter.Indexing.cu](src/Epigenetic.Promoter.Indexing.cu)**
   * **Role:** Epigenetic Methylome Indexing & Promoter Access Control.
   * **Implementation:** Maintains continuous float arrays (`d_epigenetic_weight_ACTB`, `d_epigenetic_weight_CD47`, `d_epigenetic_weight_SIRPA`, `d_epigenetic_weight_P2RY2`, `d_epigenetic_weight_ABCA1`) representing promoter access weights ([0.0, 1.0]). Initializes cell-type specific methylomes: fully opens `CD47` in senescent cells while methylating receptors; executes genetic/epigenetic knockout of `SIRPA` in senophages to prevent CD47-mediated evasion; and opens `P2RY2` and `ABCA1` euchromatin in scavenger macrophages.
 
-* **[Proteomic.Expression.State.cuh](Proteomic.Expression.State.cuh) | [Proteomic.Expression.State.cu](Proteomic.Expression.State.cu)**
+* **[Proteomic.Expression.State.cuh](src/Proteomic.Expression.State.cuh) | [Proteomic.Expression.State.cu](src/Proteomic.Expression.State.cu)**
   * **Role:** Proteomic Expression Tensor Storage & Buffer Management.
   * **Implementation:** Manages double-buffered current (T) and next (T+1) float tensors for protein expression levels of `ACTB`, `CD47`, `SIRPA`, `P2RY2`, and `ABCA1`. Executes zero-cost GPU pointer swapping (`SwapStates`) to bypass VRAM copy bandwidth overhead.
 
-* **[Central.Dogma.Transcription.cuh](Central.Dogma.Transcription.cuh) | [Central.Dogma.Transcription.cu](Central.Dogma.Transcription.cu)**
+* **[Central.Dogma.Transcription.cuh](src/Central.Dogma.Transcription.cuh) | [Central.Dogma.Transcription.cu](src/Central.Dogma.Transcription.cu)**
   * **Role:** Central Dogma Transcription & Translation Elongation Engine.
   * **Implementation:** Executes `Genomic_Translation_Kernel` using Exponential Moving Average (EMA) kinetics (translation elongation rate 0.05, proteasomal degradation 0.95). Calculates thermodynamic protein fitness (`Calculate_Thermodynamic_Protein_Fitness`) by evaluating Hamming distance bit-mismatches across locus words relative to wild-type anchors. Simulates oncogenic `CD47` overexpression when repressor locus mutations disrupt transcriptional silencing.
 
-* **[Stochastic.Mutagenesis.Kinematics.cuh](Stochastic.Mutagenesis.Kinematics.cuh) | [Stochastic.Mutagenesis.Kinematics.cu](Stochastic.Mutagenesis.Kinematics.cu)**
+* **[Stochastic.Mutagenesis.Kinematics.cuh](src/Stochastic.Mutagenesis.Kinematics.cuh) | [Stochastic.Mutagenesis.Kinematics.cu](src/Stochastic.Mutagenesis.Kinematics.cu)**
   * **Role:** Thermodynamic Genotoxicity & Oxidative Mutagenesis Engine.
   * **Implementation:** Executes `Tissue_Genotoxicity_Kernel` and `Agent_Genotoxicity_Kernel`. Models oxidative DNA damage (bit-flipping via `atomicXor`) driven by Michaelis-Menten ROS saturation kinetics from SASP concentration, tissue structural collapse, agent starvation, and lipotoxicity. Uses continuous locus hit detection (`Detect_Locus_Hit`) to track mutation strikes across coding loci vs. junk DNA.
 
-* **[Genomic.Repair.PARP.cuh](Genomic.Repair.PARP.cuh) | [Genomic.Repair.PARP.cu](Genomic.Repair.PARP.cu)**
+* **[Genomic.Repair.PARP.cuh](src/Genomic.Repair.PARP.cuh) | [Genomic.Repair.PARP.cu](src/Genomic.Repair.PARP.cu)**
   * **Role:** ATP-Dependent DNA Repair & PARP-1 Enzyme Engine.
   * **Implementation:** Executes `Tissue_PARP_Restoration_Kernel` and `Agent_PARP_Restoration_Kernel`. Simulates single-base repair capacity using non-linear Michaelis-Menten ATP kinetics (V_max = 256 bp/epoch, K_m = 30 ATP). Scans genomic loci and restores wild-type bits via `atomicXor`, deducting repair ATP taxes (0.5 ATP per repair) and scanning taxes (0.001 ATP), driving agents into bioenergetic catastrophe when ATP drops below survival thresholds (0.1f).
 
-* **[Thermodynamic.Neural.Network.cuh](Thermodynamic.Neural.Network.cuh) | [Thermodynamic.Neural.Network.cu](Thermodynamic.Neural.Network.cu)**
+* **[Thermodynamic.Neural.Network.cuh](src/Thermodynamic.Neural.Network.cuh) | [Thermodynamic.Neural.Network.cu](src/Thermodynamic.Neural.Network.cu)**
   * **Role:** Sensorimotor Neural Lattice & Hebbian Plasticity Engine.
   * **Implementation:** Manages an 8 → 2 sensorimotor neural network evaluated via cuBLAS matrix multiplication (`cublasSgemm`) and hyperbolic tangent activation (`Activation_Tanh_Batch_Kernel`). Executes Hebbian synaptic learning (`Hebbian_Plasticity_Kernel`) reinforced by net ATP change gradients, homeostatic synaptic decay (`Entropy_Decay_Kernel`), and spontaneous mEPSP miniature vesicle release noise.
 
-* **[Biophysical.Telemetry.Spooler.cuh](Biophysical.Telemetry.Spooler.cuh) | [Biophysical.Telemetry.Spooler.cu](Biophysical.Telemetry.Spooler.cu)**
+* **[Biophysical.Telemetry.Spooler.cuh](src/Biophysical.Telemetry.Spooler.cuh) | [Biophysical.Telemetry.Spooler.cu](src/Biophysical.Telemetry.Spooler.cu)**
   * **Role:** Asynchronous Telemetry Logger & Ring Buffer Disk Spooler.
   * **Implementation:** Performs GPU parallel reductions over populations and fields (`Telemetry_Agent_Reduction_Kernel`, `Telemetry_Tissue_Reduction_Kernel`, `Telemetry_SASP_ATP_Reduction_Kernel`, `Telemetry_Scavenger_Reduction_Kernel`, `Genomic_Proteomic_Reduction_Kernel`). Copies accumulator structures asynchronously to host pinned memory (`BiophysicalAccumulators`) and pushes 89-metric payloads to a lock-free ring buffer (`PreallocatedTelemetryRingBuffer`, capacity 4,194,304 records). A background worker thread spools the data to a dual-chronology CSV file.
 
-* **[SDF.Raymarch.Microscope.h](SDF.Raymarch.Microscope.h) | [SDF.Raymarch.Microscope.cpp](SDF.Raymarch.Microscope.cpp) & [Shader.Payload.h](Shader.Payload.h)**
+* **[SDF.Raymarch.Microscope.h](src/SDF.Raymarch.Microscope.h) | [SDF.Raymarch.Microscope.cpp](src/SDF.Raymarch.Microscope.cpp) & [Shader.Payload.h](src/Shader.Payload.h)**
   * **Role:** DirectX 11 Optical Raymarching Microscope & HLSL Shader Subsystem.
   * **Implementation:** Shares CUDA state buffers with D3D11 textures via CUDA-DirectX interop (`cudaGraphicsMapResources`). Compiles and executes full-screen HLSL pixel shader (`MICROSCOPE_LENS_HLSL`). Calculates signed distance fields (SDF), metaball membrane blending, phase-contrast scattering, Beer-Lambert light attenuation, SNARF-4F ratiometric pH fluorophore color shifts, Alexa Fluor 488 8-oxo-dG damage emissions, and bitwise permutation spatial hashing (`evaluate_photon_noise`) to eliminate Moiré interference artifacts.
 
-* **[Biochemical.Constants.h](Biochemical.Constants.h)**
+* **[Biochemical.Constants.h](src/Biochemical.Constants.h)**
   * **Role:** Central Biophysical Constants & Parameter Registry.
   * **Implementation:** Header file defining domain dimensions (1024 × 1024), plasma relaxation constants (`PLASMA_TAU = 0.8f`), drag coefficients, Gaussian morphological variances (σ = 3.5 μm for macrophages, σ = 4.5 μm for senescent cells), genomic locus offsets, central dogma epoch durations, Michaelis-Menten kinetic thresholds, and PARP repair constants.
 
-* **[Spatial.Optical.Integration.cuh](Spatial.Optical.Integration.cuh) | [Spatial.Optical.Integration.cu](Spatial.Optical.Integration.cu)**
+* **[Spatial.Optical.Integration.cuh](src/Spatial.Optical.Integration.cuh) | [Spatial.Optical.Integration.cu](src/Spatial.Optical.Integration.cu)**
   * **Role:** Spatial Density Projection & Optical Field Rasterization.
   * **Implementation:** Provides GPU wrappers (`ExecuteSpatialDensityProjection`, `SplatBiochemicalState`, `IntegrateOpticalFields`, `IntegrateOpticalBiochemicalFields`) to project discrete agent positions, `CD47` protein expression, and genomic mutation counts onto continuous 2D spatial grids using Gaussian splatting algorithms.
 
@@ -118,9 +118,9 @@ The engineered senolytic agent ("senophage") operates via a dual-action therapeu
 
 Comprehensive visual archives, empirical telemetry dictionaries, and peer-reviewed scientific literature foundations are available to verify the simulation engine:
 
-* **[TelemetryGallery.md:](TelemetryGallery.md)** A visual repository documenting high-resolution captures of the DirectX 11 optical microscope interface, HLSL shader renderings, pH SNARF-4F ratiometric shifts, and 89-metric telemetry visualization dashboards.
-* **[BiologicalTelemetryDataset.md:](BiologicalTelemetryDataset.md)** An analytical data dictionary for the 89-column telemetry output generated by the AsynchronousTelemetrySpooler, detailing physical, biological, genomic, and hardware performance metrics across simulation ticks.
-* **[ScientificArticlesUsedInZeroSenophage-EN.md:](ScientificArticlesUsedInZeroSenophage-EN.md)** A foundational scientific literature mapping documenting the 86 peer-reviewed articles (indexed via PubMed, PMC, and DOI) that establish the empirical parameters, kinetic constants, and biological mechanisms implemented throughout the C++/CUDA simulation kernels.
+* **[TelemetryGallery.md:](assets/TelemetryGallery.md)** A visual repository documenting high-resolution captures of the DirectX 11 optical microscope interface, HLSL shader renderings, pH SNARF-4F ratiometric shifts, and 89-metric telemetry visualization dashboards.
+* **[BiologicalTelemetryDataset.md:](assets/BiologicalTelemetryDataset.md)** An analytical data dictionary for the 89-column telemetry output generated by the AsynchronousTelemetrySpooler, detailing physical, biological, genomic, and hardware performance metrics across simulation ticks.
+* **[ScientificArticlesUsedInZeroSenophage-EN.md:](assets/ScientificArticlesUsedInZeroSenophage-EN.md)** A foundational scientific literature mapping documenting the 86 peer-reviewed articles (indexed via PubMed, PMC, and DOI) that establish the empirical parameters, kinetic constants, and biological mechanisms implemented throughout the C++/CUDA simulation kernels.
 
 --------------------------------------------------------------------------------
 
